@@ -9,24 +9,22 @@ private data class PasswordLine(
     val secondNumber: Int,
     val requiredLetter: Char,
     val password: String,
-) {
-    companion object {
-        fun fromString(line: String): PasswordLine {
-            val regex = Regex("(\\d+)-(\\d+)\\s+([a-z]):\\s+([a-z]+)")
-            val match = regex.find(line) ?: error("invalid line $line")
-            val (_, firstNumber, secondNumber, requiredLetter, password) = match.groupValues
+)
 
-            return PasswordLine(
-                firstNumber.toInt(),
-                secondNumber.toInt(),
-                requiredLetter[0],
-                password,
-            )
-        }
-    }
+private fun parsePasswordLine(line: String): PasswordLine {
+    val regex = Regex("(\\d+)-(\\d+)\\s+([a-z]):\\s+([a-z]+)")
+    val match = regex.find(line) ?: error("invalid line $line")
+    val (_, firstNumber, secondNumber, requiredLetter, password) = match.groupValues
+
+    return PasswordLine(
+        firstNumber.toInt(),
+        secondNumber.toInt(),
+        requiredLetter[0],
+        password,
+    )
 }
 
-private fun firstValidPasswordsCount() = input.map(PasswordLine::fromString)
+private fun firstValidPasswordsCount() = input.map(::parsePasswordLine)
     .count { line ->
         val minCount = line.firstNumber
         val maxCount = line.secondNumber
@@ -34,7 +32,7 @@ private fun firstValidPasswordsCount() = input.map(PasswordLine::fromString)
         count in minCount..maxCount
     }
 
-private fun secondValidPasswordsCount() = input.map(PasswordLine::fromString)
+private fun secondValidPasswordsCount() = input.map(::parsePasswordLine)
     .count { line ->
         val firstMatches = line.password[line.firstNumber - 1] == line.requiredLetter
         val secondMatches = line.password[line.secondNumber - 1] == line.requiredLetter
