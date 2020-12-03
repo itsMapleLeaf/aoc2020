@@ -1,6 +1,7 @@
 package day03
 
 import helpers.Vector
+import helpers.product
 import java.io.File
 
 private val input = File("day03.input.txt")
@@ -23,5 +24,5 @@ fun main() {
         Vector(7, 1),
         Vector(1, 2),
     )
-    println(slopes.fold(1L) { total, slope -> total * countTrees(slope) })
+    println(slopes.map(::countTrees).product())
 }

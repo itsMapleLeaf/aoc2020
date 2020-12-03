@@ -19,5 +19,3 @@ fun <T> Iterable<T>.combinations(size: Int): Sequence<Set<T>> {
     }
 }
 
-fun Iterable<Int>.product(): Int =
-    reduce { result, num -> result * num }
