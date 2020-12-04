@@ -55,8 +55,9 @@ fun Passport.isValid() = requiredFields
         val isValid = value != null && validateFn(value)
         Validation(fieldName, value, isValid)
     }
-    .onEach { if (!it.isValid) println("invalid field ${it.name}: ${it.value ?: "<missing>"}") }
-    .all { it.isValid }
+    .filter { !it.isValid }
+    .onEach { println("invalid field ${it.name}: ${it.value ?: "<missing>"}") }
+    .isEmpty()
 
 
 fun main() {
