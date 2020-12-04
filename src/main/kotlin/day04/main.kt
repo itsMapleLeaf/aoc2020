@@ -1,41 +1,41 @@
 package day04
 
-import helpers.Vector
-import helpers.product
 import java.io.File
-import java.util.regex.Pattern
 
-private typealias PassportField = Pair<String, String>
+typealias Passport = Map<String, String>
 
-private val PassportField.name get() = first
-private val PassportField.value get() = second
+fun passportFromString(passportString: String): Passport =
+    passportString
+        .split(Regex("\\s+"))
+        .map(::pairFromFieldString)
+        .toMap()
 
-private typealias Passport = List<PassportField>
+fun pairFromFieldString(fieldString: String): Pair<String, String> {
+    val (name, value) = fieldString.split(":")
+    return Pair(name, value)
+}
 
-private val Passport.fieldNames get() = map { it.name }.toSet()
-
-val passports = File("day04.input.txt").readText()
-    .split(Regex("\r?\n\r?\n"))
-    .map { passportString ->
-        val fieldStrings = passportString.split(Regex("\\s+"))
-        fieldStrings.map { fieldString ->
-            val (name, value) = fieldString.split(':')
-            PassportField(name, value)
-        }
-    }
-
-val fieldNames = listOf(
-    "byr",
-    "iyr",
-    "eyr",
-    "hgt",
-    "hcl",
-    "ecl",
-    "pid",
-//    "cid",
+val requiredFields = mapOf(
+    "byr" to { it.length == 4 && it.toIntOrNull() in 1920..2002 },
+    "iyr" to { it.length == 4 && it.toIntOrNull() in 2010..2020 },
+    "eyr" to { it.length == 4 && it.toIntOrNull() in 2020..2030 },
+    "hgt" to ::validateHeight,
+    "hcl" to { Regex("^#[0-9a-f]{6}$").matches(it) },
+    "ecl" to { it in setOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth") },
+    "pid" to { Regex("^\\d{9}$").matches(it) },
 )
 
-typealias Validator = (String) -> Boolean
+fun Passport.hasRequiredFields() =
+    keys.containsAll(requiredFields.keys)
+
+fun Passport.isValid() = requiredFields.all { (fieldName, getIsValid) ->
+    val value = this[fieldName] ?: return@all false
+    val isValid = getIsValid(value)
+    if (!isValid) {
+        println("invalid field $fieldName:$value")
+    }
+    isValid
+}
 
 fun validateHeight(heightValue: String): Boolean {
     val result = Regex("^(\\d+)(cm|in)$").find(heightValue) ?: return false
@@ -52,33 +52,11 @@ fun validateHeight(heightValue: String): Boolean {
     return value in range
 }
 
-val fieldValidations = mapOf<String, Validator>(
-    "byr" to { it.length == 4 && it.toIntOrNull() in 1920..2002 },
-    "iyr" to { it.length == 4 && it.toIntOrNull() in 2010..2020 },
-    "eyr" to { it.length == 4 && it.toIntOrNull() in 2020..2030 },
-    "hgt" to ::validateHeight,
-    "hcl" to { Regex("^#[0-9a-f]{6}$").matches(it) },
-    "ecl" to { it in setOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth") },
-    "pid" to { Regex("^\\d{9}$").matches(it) },
-)
-
 fun main() {
-    println(
-        passports.count { passport ->
-            passport.fieldNames.containsAll(fieldNames)
-        }
-    )
+    val passports: List<Passport> = File("day04.input.txt").readText()
+        .split(Regex("\r?\n\r?\n"))
+        .map(::passportFromString)
 
-    println(
-        passports.count { fields ->
-            fieldValidations.all { (fieldName, getIsValid) ->
-                val field = fields.find { it.name == fieldName } ?: return@all false
-                val isValid = getIsValid(field.value)
-                if (!isValid) {
-                    println("invalid field $field")
-                }
-                isValid
-            }
-        }
-    )
+    println(passports.count { it.hasRequiredFields() })
+    println(passports.count { it.isValid() })
 }
