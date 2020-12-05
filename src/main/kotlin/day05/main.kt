@@ -1,40 +1,30 @@
 package day05
 
+import helpers.ceil
+import helpers.floor
 import helpers.lerp
 import java.io.File
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.pow
 
+fun <T> binaryPartition(sequence: Collection<T>, rightValue: T, leftValue: T): Int {
+    var min = 0
+    var max = 2.0.pow(sequence.size).toInt()
+
+    for (char in sequence) {
+        when (char) {
+            rightValue -> min = ceil(lerp(min.toDouble(), max.toDouble(), 0.5)).toInt()
+            leftValue -> max = floor(lerp(min.toDouble(), max.toDouble(), 0.5)).toInt()
+        }
+    }
+
+    return min
+}
 
 fun getBoardingPassSeatId(pass: String): Int {
-    val row = run {
-        var min = 0
-        var max = 127
-
-        for (char in pass.slice(0..6)) {
-            when (char) {
-                'B' -> min = ceil(lerp(min.toDouble(), max.toDouble(), 0.5)).toInt()
-                'F' -> max = floor(lerp(min.toDouble(), max.toDouble(), 0.5)).toInt()
-            }
-        }
-
-        min
-    }
-
-    val col = run {
-        var min = 0
-        var max = 7
-
-        for (char in pass.slice(7..9)) {
-            when (char) {
-                'R' -> min = ceil(lerp(min.toDouble(), max.toDouble(), 0.5)).toInt()
-                'L' -> max = floor(lerp(min.toDouble(), max.toDouble(), 0.5)).toInt()
-            }
-        }
-
-        min
-    }
-
+    val row = binaryPartition(pass.slice(0..6).toList(), 'B', 'F')
+    val col = binaryPartition(pass.slice(7..9).toList(), 'R', 'L')
     return row * 8 + col
 }
 
