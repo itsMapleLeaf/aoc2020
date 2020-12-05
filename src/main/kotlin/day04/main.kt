@@ -59,7 +59,6 @@ fun Passport.isValid() = requiredFields
     .onEach { println("invalid field ${it.name}: ${it.value ?: "<missing>"}") }
     .isEmpty()
 
-
 fun main() {
     val passports: List<Passport> = File("day04.input.txt").readText()
         .split(Regex("\r?\n\r?\n"))
