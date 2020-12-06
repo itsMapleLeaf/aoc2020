@@ -1,5 +1,6 @@
 package day04
 
+import helpers.doubleLineRegex
 import java.io.File
 
 typealias Passport = Map<String, String>
@@ -61,7 +62,7 @@ fun Passport.isValid() = requiredFields
 
 fun main() {
     val passports: List<Passport> = File("day04.input.txt").readText()
-        .split(Regex("\r?\n\r?\n"))
+        .split(doubleLineRegex)
         .map(::passportFromString)
 
     println(passports.count { it.hasRequiredFields() })
