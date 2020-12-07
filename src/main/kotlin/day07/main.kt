@@ -25,13 +25,13 @@ fun main() {
         bag to children
     }.toMap()
 
-    fun BagColor.canContain(otherColor: String): Boolean =
+    fun BagColor.canContain(otherColor: BagColor): Boolean =
         bags.getValue(this).any { it.color == otherColor || it.color.canContain(otherColor) }
 
-    fun getContainmentCount(color: String) =
+    fun getContainmentCount(color: BagColor) =
         bags.keys.count { it.canContain(color) }
 
-    fun getChildCount(color: String): Int =
+    fun getChildCount(color: BagColor): Int =
         bags.getValue(color).sumBy { it.count + it.count * getChildCount(it.color) }
 
     println(getContainmentCount("shiny gold"))
