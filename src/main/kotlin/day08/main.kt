@@ -37,32 +37,32 @@ fun createInstruction(string: String): Instruction {
 }
 
 fun runProgram(instructions: List<Instruction>): ProgramResult {
-    var pointer = 0
+    var position = 0
     var accumulator = 0
-    val visitedLines = mutableSetOf<Int>()
+    val visited = mutableSetOf<Int>()
 
     while (true) {
-        visitedLines.add(pointer)
+        visited.add(position)
 
-        val (operation, value) = instructions[pointer]
+        val (operation, value) = instructions[position]
         when (operation) {
             Operation.Accumulate -> {
                 accumulator += value
-                pointer += 1
+                position += 1
             }
             Operation.Jump -> {
-                pointer += value
+                position += value
             }
             Operation.Noop -> {
-                pointer += 1
+                position += 1
             }
         }
 
-        if (visitedLines.contains(pointer)) {
+        if (visited.contains(position)) {
             return ProgramResult(ProgramStatus.Looped, accumulator)
         }
 
-        if (pointer == instructions.size) {
+        if (position == instructions.size) {
             return ProgramResult(ProgramStatus.Terminated, accumulator)
         }
     }
