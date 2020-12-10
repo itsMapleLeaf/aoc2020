@@ -1,7 +1,5 @@
 package day05
 
-import helpers.ceil
-import helpers.floor
 import helpers.lerp
 import java.io.File
 import kotlin.math.ceil
