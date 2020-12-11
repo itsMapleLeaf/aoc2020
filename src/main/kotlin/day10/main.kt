@@ -1,5 +1,6 @@
 package day10
 
+import helpers.countOf
 import helpers.product
 import java.io.File
 
@@ -36,8 +37,6 @@ fun main() {
     // math LOL
     println(groups.map { voltageSequenceCount(it.size) }.product())
 }
-
-fun <T> List<T>.countOf(value: T) = count { it == value }
 
 fun voltageSequenceCount(n: Int): Long = when (n) {
     1 -> 1

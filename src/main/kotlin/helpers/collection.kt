@@ -22,6 +22,8 @@ fun <T> Sequence<T>.combinations(size: Int): Sequence<List<T>> {
 fun <T> Iterable<T>.combinations(size: Int) =
     asSequence().combinations(size)
 
+fun <T> Iterable<T>.countOf(value: T) = count { it == value }
+
 // WHY IS THIS NOT BUILT IN
 fun <T : Comparable<T>> Iterable<T>.lowest() = minOrNull() ?: error("iterable is empty")
 fun <T : Comparable<T>> Iterable<T>.highest() = maxOrNull() ?: error("iterable is empty")
