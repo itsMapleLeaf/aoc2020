@@ -32,7 +32,7 @@ data class Grid<T>(val cells: Map<Vector, T> = emptyMap()) : Collection<T> {
 
         // i'll clean this up when i feel like it
         return (0..lines.keys.highest()).map { key -> lines[key] ?: hashMapOf() }.joinToString("\n") {
-            (0..it.keys.highest()).joinToString(", ") { key -> it[key].toString() }
+            (0..it.keys.highest()).joinToString("") { key -> it[key].toString() }
         }
     }
 

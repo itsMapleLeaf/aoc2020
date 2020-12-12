@@ -6,32 +6,19 @@ import helpers.countOf
 import helpers.toGrid
 import java.io.File
 
-enum class Cell {
-    Empty,
-    Floor,
-    Occupied,
-}
+const val CELL_EMPTY = 'L'
+const val CELL_OCCUPIED = '#'
+const val CELL_FLOOR = '.'
 
-fun Char.toCell() = when (this) {
-    'L' -> Cell.Empty
-    '#' -> Cell.Occupied
-    '.' -> Cell.Floor
-    else -> error("invalid char $this")
-}
-
-tailrec fun simulate(grid: Grid<Cell>): Grid<Cell> {
+tailrec fun simulate(grid: Grid<Char>): Grid<Char> {
     val newGrid = grid.mapWithPos { pos, cell ->
+        val occupiedCount by lazy {
+            Vector.directions.map { grid[pos + it] }.countOf(CELL_OCCUPIED)
+        }
+
         when (cell) {
-            Cell.Empty -> {
-                val isAdjacentOccupied = Vector.directions.map { grid[pos + it] }.contains(Cell.Occupied)
-                if (!isAdjacentOccupied) Cell.Occupied else cell
-            }
-
-            Cell.Occupied -> {
-                val occupiedCount = Vector.directions.map { grid[pos + it] }.countOf(Cell.Occupied)
-                if (occupiedCount >= 4) Cell.Empty else cell
-            }
-
+            CELL_EMPTY -> if (occupiedCount == 0) CELL_OCCUPIED else cell
+            CELL_OCCUPIED -> if (occupiedCount >= 4) CELL_EMPTY else cell
             else -> cell
         }
     }
@@ -39,11 +26,38 @@ tailrec fun simulate(grid: Grid<Cell>): Grid<Cell> {
     return if (grid == newGrid) newGrid else simulate(newGrid)
 }
 
+// generate a sequence that returns vectors going in `dir` from `center`
+// e.g. raycastFrom(Vector(1, 1), Vector(1, 0)) becomes [(2, 1), (3, 1), (4, 1), ...]
+fun raycast(center: Vector, dir: Vector) =
+    generateSequence(center + dir) { it + dir }
+
+tailrec fun simulateWithRaycast(grid: Grid<Char>): Grid<Char> {
+    val newGrid = grid.mapWithPos { pos, cell ->
+        val occupiedCount by lazy {
+            Vector.directions.count { dir ->
+                val lineOfSight = raycast(pos, dir).map { grid[it] }
+                lineOfSight.first { it != CELL_FLOOR } == CELL_OCCUPIED
+            }
+        }
+
+        when (cell) {
+            CELL_EMPTY -> if (occupiedCount == 0) CELL_OCCUPIED else cell
+            CELL_OCCUPIED -> if (occupiedCount >= 5) CELL_EMPTY else cell
+            else -> cell
+        }
+    }
+
+    return if (grid == newGrid) newGrid else simulateWithRaycast(newGrid)
+}
+
 fun main() {
     val grid = File("day11.input.txt").readLines()
-        .map { line -> line.map { it.toCell() } }
+        .map { line -> line.toList() }
         .toGrid()
 
     // part 1
-    println(simulate(grid).countOf(Cell.Occupied))
+    println(simulate(grid).countOf(CELL_OCCUPIED))
+
+    // part 2
+    println(simulateWithRaycast(grid).countOf(CELL_OCCUPIED))
 }
