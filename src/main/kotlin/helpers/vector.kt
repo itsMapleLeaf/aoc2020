@@ -1,5 +1,10 @@
 package helpers
 
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
+
 data class Vector(val x: Int, val y: Int) {
     companion object {
         val center = Vector(0, 0)
@@ -21,4 +26,19 @@ data class Vector(val x: Int, val y: Int) {
     }
 
     operator fun plus(vec: Vector) = Vector(x + vec.x, y + vec.y)
+
+    operator fun minus(vec: Vector) = Vector(x - vec.x, y - vec.y)
+
+    operator fun times(vec: Vector) = Vector(x * vec.x, y * vec.y)
+    operator fun times(value: Int) = Vector(x * value, y * value)
+
+    override fun toString() = "($x, $y)"
+
+    fun rotate(turns: Int): Vector {
+        val angleRadians = turns * (PI / 2)
+        return Vector(
+            (x * cos(angleRadians) - y * sin(angleRadians)).roundToInt(),
+            (y * cos(angleRadians) + x * sin(angleRadians)).roundToInt(),
+        )
+    }
 }
